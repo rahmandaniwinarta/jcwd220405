@@ -57,7 +57,6 @@ const {
   stocksComp,
 } = admin;
 
-
 // user
 app.use("/api", user);
 app.use("/api", userProfile);

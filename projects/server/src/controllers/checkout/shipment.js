@@ -63,7 +63,6 @@ module.exports = {
 
       const { origin, destination, weight, courier, delivery_fee } = req.body;
 
-
       const cost = await axios.post(
         "https://api.rajaongkir.com/starter/cost",
         {
@@ -180,6 +179,39 @@ module.exports = {
         OrderStatusId: 1,
       });
       res.status(200).send("Silahkan upload bukti pembayaran");
+    } catch (err) {
+      res.status(400).send(err);
+    }
+  },
+  uploadPayment: async (req, res) => {
+    try {
+      let fileUploaded = req.file;
+      console.log(fileUploaded);
+
+      const checkHasPaid = await Transaction.findOne({
+        where: {
+          id: req.params.id,
+        },
+        raw: true,
+      });
+      if (checkHasPaid.payment_proof) throw "You have already paid";
+
+      console.log(checkHasPaid);
+
+      await Transaction.update(
+        {
+          payment_proof: fileUploaded.filename,
+          OrderStatusId: 2,
+        },
+        {
+          where: {
+            id: req.params.id,
+          },
+        }
+      );
+      res
+        .status(200)
+        .send("Payment Uploaded, Please Wait for Admin Confirmation");
     } catch (err) {
       res.status(400).send(err);
     }
